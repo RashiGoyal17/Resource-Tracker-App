@@ -1,10 +1,57 @@
-<div class="login-container">
-  <h2>Admin Login</h2>
+<div class="auth-container">
+  <div class="form-toggle">
+    <button [class.active]="mode === 'login'" (click)="mode = 'login'">Login</button>
+    <button [class.active]="mode === 'signup'" (click)="mode = 'signup'">Sign Up</button>
+  </div>
+
+  <h2>{{ mode === 'login' ? 'Admin Login' : 'Create Account' }}</h2>
+
   <form (ngSubmit)="login()" #loginForm="ngForm">
-    <input type="text" name="username" [(ngModel)]="username" placeholder="Username" required>
-    <input type="password" name="password" [(ngModel)]="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+    
+    <!-- Username is always required -->
+    <input
+      type="text"
+      name="username"
+      [(ngModel)]="username"
+      placeholder="Username"
+      required
+    />
+
+    <!-- Email only for signup -->
+    <input
+      *ngIf="mode === 'signup'"
+      type="email"
+      name="email"
+      [(ngModel)]="email"
+      placeholder="Email"
+      required
+    />
+
+    <!-- Password -->
+    <input
+      type="password"
+      name="password"
+      [(ngModel)]="password"
+      placeholder="Password"
+      required
+    />
+
+    <!-- Confirm password only for signup -->
+    <input
+      *ngIf="mode === 'signup'"
+      type="password"
+      name="confirmPassword"
+      [(ngModel)]="confirmPassword"
+      placeholder="Confirm Password"
+      required
+    />
+
+    <button type="submit">
+      {{ mode === 'login' ? 'Login' : 'Sign Up' }}
+    </button>
+
+    <div *ngIf="errorMessage" class="error">
+      {{ errorMessage }}
+    </div>
   </form>
 </div>
-

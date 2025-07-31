@@ -1,13 +1,13 @@
-// Header styling
-.app-header {
-  background-color: #1e3a8a; // deep navy blue
-  color: white;
-  padding: 1rem;
-  text-align: center;
-  font-size: 1.6rem;
-  font-weight: bold;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+// // Header styling
+// .app-header {
+//   background-color: #1e3a8a; // deep navy blue
+//   color: white;
+//   padding: 1rem;
+//   text-align: center;
+//   font-size: 1.6rem;
+//   font-weight: bold;
+//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+// }
 
 // Tab navigation container
 .nav-tabs-container {
@@ -48,50 +48,68 @@
 }
 
 
-.toolbar-container {
+.app-header {
+  background-color: #1e3a8a; // deep navy blue
+  color: white;
+  padding: 1rem 20px;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 15px 20px;
-  flex-wrap: wrap;
 
-  .toolbar {
+  .brand-title {
+    flex-grow: 1;
+    text-align: left;
+  }
+
+  .header-actions {
     display: flex;
     gap: 10px;
+    align-items: center;
+  }
 
-    input[type="text"] {
-      padding: 6px 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
+  .export-select {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    background-color: white;
+    color: #1e3a8a;
+    font-weight: 600;
+    min-width: 160px;
+    transition: background-color 0.3s ease;
 
-    select {
-      padding: 6px 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+    &:hover {
+      background-color: #e1e7f7;
     }
   }
 
-  .export-btn {
-    button {
-      padding: 6px 15px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+  .btn {
+    padding: 6px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
 
-      &:hover {
-        background-color: #0056b3;
-      }
+  .logout-btn {
+    background-color: #ff4d4f;
+    color: white;
+
+    &:hover {
+      background-color: #d9363e;
     }
   }
 }
 
 
-::ng-deep .k-dropdownbutton .k-button-text {
-  color: white !important;
-}
 
 
 

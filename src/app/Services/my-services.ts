@@ -9,7 +9,7 @@ import { Environment } from '../../environments/environment';
 })
 export class MyServices {
 
-  private baseUrl = Environment.URI;
+  private baseUrl: string = Environment.URI + 'Home/';
 
   selectedTabIndex$ = new BehaviorSubject<number>(0)
   selectedEmployee$ = new BehaviorSubject<Employee | null>(null)
@@ -74,5 +74,8 @@ getSelectedEmployeeValue(): Employee | null {
     this.loggedIn$.next(false);
   }
 
+  isLoggedInValue(): boolean {
+  return !!localStorage.getItem('token');
+}
 
 };

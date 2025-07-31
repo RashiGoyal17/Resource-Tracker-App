@@ -39,8 +39,6 @@ export class Parent implements OnInit {
       this.isLoggedIn = loggedIn;
     });
 
-
-
     this.myService.getSelectedEmployee().subscribe((employee) => {
       if (employee) {
         this.isAnyEmployeeSelected = true
@@ -49,14 +47,55 @@ export class Parent implements OnInit {
         this.isAnyEmployeeSelected = false
       }
     })
-
-
   }
 
-    logout() {
+
+  logout() {
     this.myService.logout();
     this.router.navigate(['/login']);  // Redirect to login page after logout
   }
+
+  onExportSelect(event: Event) {
+  const select = event.target as HTMLSelectElement;
+  const format = select.value;
+
+  if (!format) return;
+
+  // reset dropdown after selection
+  select.selectedIndex = 0;
+
+  // same logic as before
+  this.myService.getAll().subscribe(employeeList => {
+    this.exportService.setEmployees(employeeList);
+
+    switch (format) {
+      case 'csv':
+        this.exportService.exportToCSV();
+        break;
+      case 'excel':
+        this.exportService.exportToExcel();
+        break;
+      case 'pdf':
+        const employee = this.myService.getSelectedEmployeeValue();
+        if (!employee) {
+          this.toastr.warning('Please select an employee to export as PDF.', 'Warning');
+          return;
+        }
+        if (employee.empId == null) {
+          this.toastr.error('Selected employee does not have a valid ID.', 'Error');
+          return;
+        }
+        this.myService.get(employee.empId).subscribe(fullEmp => {
+          this.exportService.exportToPDF(fullEmp);
+        }, error => {
+          this.toastr.error('Failed to load employee details.', 'Error');
+          console.error(error);
+        });
+        break;
+    }
+  });
+}
+
 
 
   exportOptions = [
@@ -64,52 +103,6 @@ export class Parent implements OnInit {
     { text: 'Export as Excel', format: 'excel' },
     { text: 'Export Selected as PDF', format: 'pdf' }
   ];
-
-
-  // exportCSV() {
-  //   this.exportService.exportToCSV();
-  // }
-
-
-
-  onExportOptionSelected(event: any) {
-    const format = event.format;
-
-    // Fetch the employee list first
-    this.myService.getAll().subscribe(employeeList => {
-      this.exportService.setEmployees(employeeList);
-
-      switch (format) {
-        case 'csv':
-          this.exportService.exportToCSV();
-          break;
-        case 'excel':
-          this.exportService.exportToExcel();
-          break;
-        case 'pdf':
-          const employee = this.myService.getSelectedEmployeeValue();
-          console.log('Selected employee for PDF export:', employee);
-          if (!employee) {
-            this.toastr.warning('Please select an employee to export as PDF.', 'Warning');
-            return;
-          }
-          // this.exportService.exportToPDF(employee);
-          // Fetch full employee details from API using ID
-          if (employee.empId == null) {
-            this.toastr.error('Selected employee does not have a valid ID.', 'Error');
-            return;
-          }
-          this.myService.get(employee.empId).subscribe(fullEmp => {
-            this.exportService.exportToPDF(fullEmp);
-          }, error => {
-            this.toastr.error('Failed to load employee details.', 'Error');
-            console.error(error);
-          });
-          break;
-      }
-    });
-  }
-
 
 
   routeToEditOrAddForm() {

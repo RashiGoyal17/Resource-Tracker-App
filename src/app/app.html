@@ -1,1 +1,9 @@
-<app-parent></app-parent>
+<!-- <app-parent></app-parent> -->
+
+<ng-container *ngIf="isLoggedIn; else authRoutes">
+  <router-outlet></router-outlet>
+</ng-container>
+
+<ng-template #authRoutes>
+  <router-outlet></router-outlet>
+</ng-template>
