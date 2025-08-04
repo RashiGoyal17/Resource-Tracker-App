@@ -1,57 +1,69 @@
+<div class="branding">
+  <h1>Track<span class="at">&#64;</span>ble</h1>
+  <p class="tagline">Helps you track business</p>
+</div>
+
 <div class="auth-container">
   <div class="form-toggle">
-    <button [class.active]="mode === 'login'" (click)="mode = 'login'">Login</button>
-    <button [class.active]="mode === 'signup'" (click)="mode = 'signup'">Sign Up</button>
+    <button [class.active]="mode === 'login'" (click)="switchMode('login')">Login</button>
+    <button [class.active]="mode === 'signup'" (click)="switchMode('signup')">Sign Up</button>
   </div>
 
   <h2>{{ mode === 'login' ? 'Admin Login' : 'Create Account' }}</h2>
 
-  <form (ngSubmit)="login()" #loginForm="ngForm">
-    
-    <!-- Username is always required -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Username -->
     <input
       type="text"
-      name="username"
-      [(ngModel)]="username"
+      formControlName="username"
       placeholder="Username"
-      required
     />
+    <div class="error" *ngIf="form.get('username')?.touched && form.get('username')?.invalid">
+      Username is required
+    </div>
 
-    <!-- Email only for signup -->
+    <!-- Email -->
     <input
       *ngIf="mode === 'signup'"
       type="email"
-      name="email"
-      [(ngModel)]="email"
+      formControlName="email"
       placeholder="Email"
-      required
     />
+    <div class="error" *ngIf="mode === 'signup' && form.get('email')?.touched && form.get('email')?.invalid">
+      Valid email is required
+    </div>
 
     <!-- Password -->
     <input
       type="password"
-      name="password"
-      [(ngModel)]="password"
+      formControlName="password"
       placeholder="Password"
-      required
     />
+    <div class="error" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+      Password must be at least 5 characters
+    </div>
 
-    <!-- Confirm password only for signup -->
+    <!-- Confirm Password -->
     <input
       *ngIf="mode === 'signup'"
       type="password"
-      name="confirmPassword"
-      [(ngModel)]="confirmPassword"
+      formControlName="confirmPassword"
       placeholder="Confirm Password"
-      required
     />
+    <div class="error" *ngIf="mode === 'signup' && form.get('confirmPassword')?.touched && form.get('confirmPassword')?.invalid">
+      Confirm Password is required
+    </div>
+    <div class="error" *ngIf="mode === 'signup' && form.get('confirmPassword')?.touched && form.value.password !== form.value.confirmPassword">
+      Passwords do not match
+    </div>
 
-    <button type="submit">
+    <button type="submit" [disabled]="form.invalid">
       {{ mode === 'login' ? 'Login' : 'Sign Up' }}
     </button>
 
-    <div *ngIf="errorMessage" class="error">
+    <div class="error" *ngIf="errorMessage">
       {{ errorMessage }}
     </div>
   </form>
 </div>
+

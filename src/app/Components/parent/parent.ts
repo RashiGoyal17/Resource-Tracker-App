@@ -114,4 +114,7 @@ export class Parent implements OnInit {
   }
 }
 
-
+// toggleDarkMode() {
+//   this.darkMode = !this.darkMode;
+//   document.body.classList.toggle('dark-mode', this.darkMode);
+// }
