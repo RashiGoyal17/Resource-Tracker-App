@@ -14,7 +14,7 @@ export class MyServices {
   selectedTabIndex$ = new BehaviorSubject<number>(0)
   selectedEmployee$ = new BehaviorSubject<Employee | null>(null)
 
-   private loggedIn$ = new BehaviorSubject<boolean>(!!localStorage.getItem('token'));
+  private loggedIn$ = new BehaviorSubject<boolean>(!!localStorage.getItem('token'));
 
   getSelectedEmployee() {
     return this.selectedEmployee$.asObservable()
@@ -32,32 +32,32 @@ export class MyServices {
   update(empId: number, emp: CreateEmployeeRequest): Observable<Employee> { return this.http.put<Employee>(`${this.baseUrl}${empId}`, emp); }
   delete(empId: number): Observable<void> { return this.http.delete<void>(`${this.baseUrl}Delete/${empId}`); }
   getDesignations(): Observable<string[]> {
-  return this.http.get<string[]>(this.baseUrl + 'designations');
-}
+    return this.http.get<string[]>(this.baseUrl + 'designations');
+  }
 
-getLocations(): Observable<string[]> {
-  return this.http.get<string[]>(this.baseUrl + 'locations');
-}
+  getLocations(): Observable<string[]> {
+    return this.http.get<string[]>(this.baseUrl + 'locations');
+  }
 
-getSkills(): Observable<string[]> {
-  return this.http.get<string[]>(this.baseUrl + 'skills');
-}
+  getSkills(): Observable<string[]> {
+    return this.http.get<string[]>(this.baseUrl + 'skills');
+  }
 
-getProjects(): Observable<string[]> {
-  return this.http.get<string[]>(this.baseUrl + 'projects');
-}
+  getProjects(): Observable<string[]> {
+    return this.http.get<string[]>(this.baseUrl + 'projects');
+  }
 
-getManagers(): Observable<string[]> {
-  return this.http.get<string[]>(this.baseUrl + 'managers');
-}
+  getManagers(): Observable<string[]> {
+    return this.http.get<string[]>(this.baseUrl + 'managers');
+  }
 
-bulkAddEmployees(employees: any[]): Observable<any> {
-  return this.http.post(this.baseUrl + 'AddEmployees', employees);
-}
+  bulkAddEmployees(employees: any[]): Observable<any> {
+    return this.http.post(this.baseUrl + 'AddEmployees', employees);
+  }
 
-getSelectedEmployeeValue(): Employee | null {
-  return this.selectedEmployee$.getValue();
-}
+  getSelectedEmployeeValue(): Employee | null {
+    return this.selectedEmployee$.getValue();
+  }
 
   // Observable to track login state
   get isLoggedIn(): Observable<boolean> {
@@ -75,7 +75,7 @@ getSelectedEmployeeValue(): Employee | null {
   }
 
   isLoggedInValue(): boolean {
-  return !!localStorage.getItem('token');
-}
+    return !!localStorage.getItem('token');
+  }
 
 };

@@ -13,49 +13,38 @@
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <!-- Username -->
-    <input
-      type="text"
-      formControlName="username"
-      placeholder="Username"
-    />
+    <input type="text" formControlName="username" placeholder="Username" />
     <div class="error" *ngIf="form.get('username')?.touched && form.get('username')?.invalid">
       Username is required
     </div>
 
     <!-- Email -->
-    <input
-      *ngIf="mode === 'signup'"
-      type="email"
-      formControlName="email"
-      placeholder="Email"
-    />
+    <input *ngIf="mode === 'signup'" type="email" formControlName="email" placeholder="Email" />
     <div class="error" *ngIf="mode === 'signup' && form.get('email')?.touched && form.get('email')?.invalid">
       Valid email is required
     </div>
 
     <!-- Password -->
-    <input
-      type="password"
-      formControlName="password"
-      placeholder="Password"
-    />
+    <input type="password" formControlName="password" placeholder="Password" />
     <div class="error" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
       Password must be at least 5 characters
     </div>
 
     <!-- Confirm Password -->
-    <input
-      *ngIf="mode === 'signup'"
-      type="password"
-      formControlName="confirmPassword"
-      placeholder="Confirm Password"
-    />
-    <div class="error" *ngIf="mode === 'signup' && form.get('confirmPassword')?.touched && form.get('confirmPassword')?.invalid">
+    <input *ngIf="mode === 'signup'" type="password" formControlName="confirmPassword" placeholder="Confirm Password" />
+    <div class="error"
+      *ngIf="mode === 'signup' && form.get('confirmPassword')?.touched && form.get('confirmPassword')?.invalid">
       Confirm Password is required
     </div>
-    <div class="error" *ngIf="mode === 'signup' && form.get('confirmPassword')?.touched && form.value.password !== form.value.confirmPassword">
+    <div class="error"
+      *ngIf="mode === 'signup' && form.get('confirmPassword')?.touched && form.value.password !== form.value.confirmPassword">
       Passwords do not match
     </div>
+
+    <select *ngIf="mode === 'signup'" name="roleId" id="roleId" formControlName="roleId">
+      <option [value]="null" hidden selected>Select Role</option>
+      <option *ngFor="let role of roleOptionList" [value]="role.id">{{ role.name }}</option>
+    </select>
 
     <button type="submit" [disabled]="form.invalid">
       {{ mode === 'login' ? 'Login' : 'Sign Up' }}
@@ -66,4 +55,3 @@
     </div>
   </form>
 </div>
-

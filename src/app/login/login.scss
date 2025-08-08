@@ -51,7 +51,7 @@ $error-color: #d9534f;
     display: flex;
     flex-direction: column;
 
-    input {
+    input, select {
       margin-bottom: 5px;
       padding: 12px;
       border: 1px solid #ccc;
@@ -174,7 +174,9 @@ body.dark-mode {
   }
 }
 
-
+option[hidden] {
+  
+}
 
 // // Fonts + theme colors
 // $primary-color: #1e3a8a; // industrial blue
