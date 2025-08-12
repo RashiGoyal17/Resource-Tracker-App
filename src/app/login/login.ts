@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Environment } from '../../environments/environment';
+import { AuthService } from '../Services/auth-service';
 
 @Component({
   selector: 'app-login',
@@ -15,109 +16,103 @@ import { Environment } from '../../environments/environment';
 })
 export class Login {
 
-
   form!: FormGroup;
   errorMessage = '';
-  mode: 'login' | 'signup' = 'login';
-  roleOptionList: any[] = [];
+  // mode: 'login' | 'signup' = 'login';
+  // roleOptionList: any[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
     private router: Router,
-    private myServices: MyServices
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
     this.initForm();
-    this.GetRoleOptions();
+    // this.GetRoleOptions();
   }
 
-  GetRoleOptions() {
-    this.http.get(Environment.URI + 'Auth/RoleOptions').subscribe({
-      next: (response: any) => {
-        this.roleOptionList = response.roleOptionList;
-      },
-      error: (err: any) => {
-        console.error(err);
-      }
-    })
-  }
+  // GetRoleOptions() {
+  //   this.http.get(Environment.URI + 'Auth/RoleOptions').subscribe({
+  //     next: (response: any) => {
+  //       this.roleOptionList = response.roleOptionList;
+  //     },
+  //     error: (err: any) => {
+  //       console.error(err);
+  //     }
+  //   })
+  // }
 
   initForm() {
-    if (this.mode === 'login') {
-      this.form = this.fb.group({
-        username: ['', Validators.required],
-        password: ['', [Validators.required, Validators.minLength(5)]]
-      });
-    } else {
-      this.form = this.fb.group({
-        username: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(5)]],
-        confirmPassword: ['', Validators.required],
-        roleId: [null, Validators.required]
-      });
-    }
+    // if (this.mode === 'login') {
+    this.form = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(5)]]
+    });
+    // }
+    //  else {
+    //   this.form = this.fb.group({
+    //     username: ['', Validators.required],
+    //     email: ['', [Validators.required, Validators.email]],
+    //     password: ['', [Validators.required, Validators.minLength(5)]],
+    //     confirmPassword: ['', Validators.required],
+    //     roleId: [null, Validators.required]
+    //   });
+    // }
 
     // Add confirmPassword validator only in signup mode
-    if (this.mode === 'signup') {
-      this.form.get('confirmPassword')?.setValidators([Validators.required]);
-    }
+    // if (this.mode === 'signup') {
+    //   this.form.get('confirmPassword')?.setValidators([Validators.required]);
+    // }
 
   }
 
-  switchMode(mode: 'login' | 'signup') {
-    this.mode = mode;
-    this.errorMessage = '';
-    this.form.reset();
-    this.initForm();
-  }
+  // switchMode(mode: 'login' | 'signup') {
+  //   this.mode = mode;
+  //   this.errorMessage = '';
+  //   this.form.reset();
+  //   this.initForm();
+  // }
 
   onSubmit() {
     if (this.form.invalid) return;
 
-    const { username, password, email, confirmPassword, roleId } = this.form.value;
+    const { username, password } = this.form.value;
 
-    if (this.mode === 'signup' && password !== confirmPassword) {
-      this.errorMessage = 'Passwords do not match';
-      return;
-    }
+    // , email, confirmPassword, roleId 
 
-    if (this.mode === 'login') {
-      this.http.post<any>(Environment.URI + 'Auth/login', {
-        username,
-        password
-      }).subscribe({
-        next: res => {
-          this.myServices.login(res.token);
-          this.router.navigate(['/Home']);
-        },
-        error: err => {
-          this.errorMessage = err?.error?.message || 'Login failed';
-        }
-      });
-    } else {
-      let payload: any = {
-        username,
-        password,
-        email,
-        roleId
-      };
-      console.log(payload);
+    // if (this.mode === 'signup' && password !== confirmPassword) {
+    //   this.errorMessage = 'Passwords do not match';
+    //   return;
+    // }
 
-      this.http.post<any>(Environment.URI + 'Auth/signup', payload).subscribe({
-        next: res => {
-          console.log(res);
-          this.myServices.login(res.token);
-          this.router.navigate(['/Home']);
-        },
-        error: err => {
-          console.log(err);
-          this.errorMessage = err?.error?.message || 'Signup failed';
-        }
-      });
-    }
+    // if (this.mode === 'login') {
+    this.authService.Login({
+      username,
+      password
+    }).subscribe({
+      next: res => {
+        this.authService.login(res.token);
+        this.authService.decodeToken();
+        this.router.navigate(['/Home']);
+      },
+      error: err => {
+        this.errorMessage = err?.error?.message || 'Login failed';
+      }
+    });
+    // } 
+    // else {
+    //   let payload: any = {
+    //     username,
+    //     password,
+    //     email,
+    //     roleId
+    //   };
+    //   console.log(payload);
+
+    //  
+
+    // }
   }
 
 }

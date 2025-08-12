@@ -1,0 +1,54 @@
+<div class="auth-container">
+  <h2>Create New User</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <input type="text" formControlName="username" placeholder="Username" />
+      <div class="error-message" *ngIf="form.get('username')?.touched && form.get('username')?.invalid">
+        Username is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <input type="email" formControlName="email" placeholder="Email" />
+      <div class="error-message" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+        Valid email is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <input type="password" formControlName="password" placeholder="Password" />
+      <div class="error-message" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+        Password must be at least 5 characters
+      </div>
+    </div>
+
+    <div class="form-group">
+      <input type="password" formControlName="confirmPassword" placeholder="Confirm Password" />
+      <div class="error-message" *ngIf="form.get('confirmPassword')?.touched && form.get('confirmPassword')?.invalid">
+        Confirm Password is required
+      </div>
+      <div class="error-message" *ngIf="form.get('confirmPassword')?.touched && form.value.password !== form.value.confirmPassword">
+        Passwords do not match
+      </div>
+    </div>
+
+    <div class="form-group">
+      <select name="roleId" id="roleId" formControlName="roleId" class="custom-select">
+        <option [value]="null" hidden selected>Select Role</option>
+        <option *ngFor="let role of roleOptionList" [value]="role.id">{{ role.name }}</option>
+      </select>
+      <div class="error-message" *ngIf="form.get('roleId')?.touched && form.get('roleId')?.invalid">
+        Role is required
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="form.invalid">Create User</button>
+
+    <div class="success-message" *ngIf="successMessage">
+      {{ successMessage }}
+    </div>
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+  </form>
+</div>

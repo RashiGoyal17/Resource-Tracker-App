@@ -14,8 +14,6 @@ export class MyServices {
   selectedTabIndex$ = new BehaviorSubject<number>(0)
   selectedEmployee$ = new BehaviorSubject<Employee | null>(null)
 
-  private loggedIn$ = new BehaviorSubject<boolean>(!!localStorage.getItem('token'));
-
   getSelectedEmployee() {
     return this.selectedEmployee$.asObservable()
   }
@@ -58,24 +56,4 @@ export class MyServices {
   getSelectedEmployeeValue(): Employee | null {
     return this.selectedEmployee$.getValue();
   }
-
-  // Observable to track login state
-  get isLoggedIn(): Observable<boolean> {
-    return this.loggedIn$.asObservable();
-  }
-
-  login(token: string) {
-    localStorage.setItem('token', token);
-    this.loggedIn$.next(true);
-  }
-
-  logout() {
-    localStorage.removeItem('token');
-    this.loggedIn$.next(false);
-  }
-
-  isLoggedInValue(): boolean {
-    return !!localStorage.getItem('token');
-  }
-
 };

@@ -5,11 +5,12 @@ import { ToastrModule } from 'ngx-toastr';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MyServices } from './Services/my-services';
+import { AuthService } from './Services/auth-service';
 
 @Component({
   selector: 'app-root',
-  standalone:true,
-  imports: [ToastrModule,RouterOutlet,CommonModule],
+  standalone: true,
+  imports: [ToastrModule, RouterOutlet, CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -17,10 +18,10 @@ export class App {
   isLoggedIn = false;
   protected title = 'final';
 
-  constructor(private myService: MyServices) {}
+  constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
-    this.myService.isLoggedIn.subscribe(loggedIn => {
+    this.authService.isLoggedIn.subscribe(loggedIn => {
       this.isLoggedIn = loggedIn;
     });
   }

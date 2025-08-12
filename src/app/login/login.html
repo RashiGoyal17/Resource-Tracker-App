@@ -3,35 +3,57 @@
   <p class="tagline">Helps you track business</p>
 </div>
 
-<div class="auth-container">
-  <div class="form-toggle">
-    <button [class.active]="mode === 'login'" (click)="switchMode('login')">Login</button>
-    <button [class.active]="mode === 'signup'" (click)="switchMode('signup')">Sign Up</button>
-  </div>
-
-  <h2>{{ mode === 'login' ? 'Admin Login' : 'Create Account' }}</h2>
-
+<div class = "auth-container">
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <!-- Username -->
-    <input type="text" formControlName="username" placeholder="Username" />
-    <div class="error" *ngIf="form.get('username')?.touched && form.get('username')?.invalid">
-      Username is required
-    </div>
 
-    <!-- Email -->
-    <input *ngIf="mode === 'signup'" type="email" formControlName="email" placeholder="Email" />
-    <div class="error" *ngIf="mode === 'signup' && form.get('email')?.touched && form.get('email')?.invalid">
-      Valid email is required
-    </div>
+    <input type ="text" formControlName = "username" placeholder="Username">
+    <div class="error" *ngIf= "form.get('username')?.touched && form.get('username')?.invalid">Username is required</div>
 
-    <!-- Password -->
     <input type="password" formControlName="password" placeholder="Password" />
     <div class="error" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
       Password must be at least 5 characters
     </div>
 
+    <button type="submit" [disabled]="form.invalid">Login</button>
+
+    <div class="error" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+  </form>
+</div>
+
+
+
+<!-- <div class="auth-container">
+  <div class="form-toggle">
+    <button [class.active]="mode === 'login'" (click)="switchMode('login')">Login</button>
+    <button [class.active]="mode === 'signup'" (click)="switchMode('signup')">Sign Up</button>
+  </div>
+
+  <h2>{{ mode === 'login' ? '' : 'Create Account' }}</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()"> -->
+    <!-- Username -->
+    <!-- <input type="text" formControlName="username" placeholder="Username" />
+    <div class="error" *ngIf="form.get('username')?.touched && form.get('username')?.invalid">
+      Username is required
+    </div> -->
+
+    <!-- Email -->
+    <!-- <input *ngIf="mode === 'signup'" type="email" formControlName="email" placeholder="Email" />
+    <div class="error" *ngIf="mode === 'signup' && form.get('email')?.touched && form.get('email')?.invalid">
+      Valid email is required
+    </div> -->
+
+    <!-- Password -->
+    <!-- <input type="password" formControlName="password" placeholder="Password" />
+    <div class="error" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+      Password must be at least 5 characters
+    </div> -->
+
     <!-- Confirm Password -->
-    <input *ngIf="mode === 'signup'" type="password" formControlName="confirmPassword" placeholder="Confirm Password" />
+    <!-- <input *ngIf="mode === 'signup'" type="password" formControlName="confirmPassword" placeholder="Confirm Password" />
     <div class="error"
       *ngIf="mode === 'signup' && form.get('confirmPassword')?.touched && form.get('confirmPassword')?.invalid">
       Confirm Password is required
@@ -54,4 +76,4 @@
       {{ errorMessage }}
     </div>
   </form>
-</div>
+</div> -->

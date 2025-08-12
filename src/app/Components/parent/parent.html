@@ -1,6 +1,8 @@
 <header class="app-header" style="position: relative;">
     <div class="brand-title">Resource Tracking Application</div>
     <div class="header-actions">
+      <button class="btn create-user-btn" *ngIf="IsAdmin()" (click)="onCreateUser()">Create New User</button>
+      <button class="btn user-management-btn" (click)="onUserManagement()" *ngIf="IsAdmin()">User Management</button>
       <select class="export-select" (change)="onExportSelect($event)">
         <option value="" disabled selected>Export Options</option>
         <option *ngFor="let option of exportOptions" [value]="option.format">{{ option.text }}</option>
@@ -11,9 +13,10 @@
 
   <nav class="nav-tabs-container">
     <ul class="nav-tabs">
+      <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
       <li><a routerLink="/Home" routerLinkActive="active">Home</a></li>
       <li>
-        <a 
+        <a *ngIf="!IsEmployee()" 
           [routerLink]="selectedEmployeeId ? ['/Edit', selectedEmployeeId] : ['/Edit']"
           routerLinkActive="active">
           Form

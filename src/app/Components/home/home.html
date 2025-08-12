@@ -1,11 +1,3 @@
-<div class="landing-intro">
-  <h1>Welcome to the Resource Tracking Application</h1>
-  <p>
-    This application helps you efficiently manage and track employee resources within your organization. 
-  </p>
-</div>
-
-
 <div class="Kendo-grid-container">
   <kendo-grid [kendoGridBinding]="userList" [skip]="0" [pageSize]="gridState.take!" [pageable]="true" [sortable]="true"
     [filterable]="true" (dataStateChange)="onDataStateChange($event)" [selectable]="{
@@ -20,9 +12,9 @@
       <kendo-toolbar-separator></kendo-toolbar-separator>
       <kendo-toolbar-button kendoGridColumnChooserTool></kendo-toolbar-button>
       <kendo-toolbar-spacer></kendo-toolbar-spacer>
-      <kendo-toolbar-button id="Delete-btn" [text]="'Delete'" (click)="onDeleteMultiple()"></kendo-toolbar-button>
-      <kendo-toolbar-button [text]="'Bulk Edit'" (click)="onBulkEdit()" [disabled]="!selectedKeys.length"></kendo-toolbar-button>
-      <kendo-toolbar-button class="import-btn" (click)="onImportExcel()" [text]="'Import Excel'"></kendo-toolbar-button>
+      <kendo-toolbar-button *ngIf="!IsEmployee()" id="Delete-btn" [text]="'Delete'" (click)="onDeleteMultiple()"></kendo-toolbar-button>
+      <kendo-toolbar-button *ngIf="!IsEmployee()" [text]="'Bulk Edit'" (click)="onBulkEdit()" [disabled]="!selectedKeys.length"></kendo-toolbar-button>
+      <kendo-toolbar-button *ngIf="!IsEmployee()" class="import-btn" (click)="onImportExcel()" [text]="'Import Excel'"></kendo-toolbar-button>
     </kendo-toolbar>
 
     <kendo-grid-checkbox-column [showSelectAll]="true" [width]="25"></kendo-grid-checkbox-column>
@@ -52,15 +44,16 @@
 
     <kendo-grid-column title="Actions" [width]="150">
       <ng-template kendoGridCellTemplate let-dataItem>
-        <button class="action-btn edit" (click)="onEdit(dataItem)" title="Edit">✏️</button>
+        <button *ngIf="!IsEmployee()" class="action-btn edit" (click)="onEdit(dataItem)" title="Edit">✏️</button>
         <button class="action-btn details" (click)="onMore(dataItem)" title="Details">👁️</button>
-        <button class="action-btn delete" (click)="onDel(dataItem.empId!)" title="Delete">🗑️</button>
+        <button *ngIf="!IsEmployee()"
+        class="action-btn delete" (click)="onDel(dataItem.empId!)" title="Delete">🗑️</button>
       </ng-template>
     </kendo-grid-column>
   </kendo-grid>
 </div>
 
-<kendo-dialog *ngIf="showBulkEditModal" title="Bulk Edit Employees" (close)="closeBulkEditModal()">
+<kendo-dialog  *ngIf="showBulkEditModal" title="Bulk Edit Employees" (close)="closeBulkEditModal()">
   <form [formGroup]="bulkEditForm" (ngSubmit)="onBulkEditSubmit()">
 
     <label>Designation:

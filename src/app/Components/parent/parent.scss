@@ -107,6 +107,26 @@
       background-color: #d9363e;
     }
   }
+
+.create-user-btn {
+    background-color: #4CAF50; // A green color for the "Create User" button
+    color: white;
+    
+    &:hover {
+      background-color: #45a049;
+    }
+  }
+
+    .user-management-btn {
+    background-color: #008CBA; // A blue color for the "User Management" button
+    color: white;
+
+    &:hover {
+        background-color: #0076a3;
+    }
+  }
+
+
 }
 
 

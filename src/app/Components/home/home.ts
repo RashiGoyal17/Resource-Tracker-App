@@ -16,6 +16,7 @@ import { DialogModule } from '@progress/kendo-angular-dialog';
 import * as XLSX from 'xlsx';
 import { MultiSelectModule } from '@progress/kendo-angular-dropdowns';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../../Services/auth-service';
 
 
 @Component({
@@ -69,7 +70,8 @@ export class Home implements OnInit {
   };
 
   userList: Employee[] = [];
-  constructor(private fb: FormBuilder, private empService: MyServices, private router: Router, private exportService: ExportServices, private toastr: ToastrService) { }
+  constructor(private fb: FormBuilder, private empService: MyServices, 
+    private router: Router, private exportService: ExportServices, private authService: AuthService,private toastr: ToastrService) { }
   ngOnInit() {
     this.empService.getAll().subscribe((list: any) => {
       console.log(list);
@@ -109,6 +111,11 @@ export class Home implements OnInit {
     this.gridData.data = processed.data;
     this.gridData.total = processed.total;
   }
+
+  IsEmployee() : boolean{
+    return this.authService.getRole() === "Employee";
+  }
+
 
   onDataStateChange(state: State): void {
     this.gridState = state;
