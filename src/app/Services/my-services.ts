@@ -2,7 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { CreateEmployeeRequest, Employee } from '../Interface/Interface';
-import { Environment } from '../../environments/environment';
+import { Environment } from '../../environments/environment'; 
+import { DashboardData } from '../Interface/DashboardData';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,7 @@ export class MyServices {
 
 
   constructor(private http: HttpClient) { }
+
   getAll(): Observable<Employee[]> { return this.http.get<Employee[]>(this.baseUrl + 'GetAll'); }
   get(empId: number): Observable<Employee> { return this.http.get<Employee>(`${this.baseUrl}${empId}`); }
   add(emp: any): Observable<Employee> { return this.http.post<Employee>(this.baseUrl + 'AddEmployee', emp); }
@@ -56,4 +58,9 @@ export class MyServices {
   getSelectedEmployeeValue(): Employee | null {
     return this.selectedEmployee$.getValue();
   }
+
+  getDashboardData():Observable<DashboardData>{
+    return this.http.get<DashboardData>(this.baseUrl + 'DashboardData', )
+  }
+
 };

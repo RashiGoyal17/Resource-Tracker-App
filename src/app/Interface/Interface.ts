@@ -25,3 +25,4 @@ export interface CreateEmployeeRequest {
   doj?: string; // ISO date
   remarks?: string;
 }
+

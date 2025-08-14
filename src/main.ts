@@ -5,6 +5,7 @@ import { App } from './app/app';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { importProvidersFrom } from '@angular/core';
 import { ToastrModule } from 'ngx-toastr';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 
 bootstrapApplication(App, {
@@ -12,6 +13,7 @@ bootstrapApplication(App, {
   providers: [
     ...appConfig.providers,
     provideAnimations(),
-    importProvidersFrom(ToastrModule.forRoot())
+    importProvidersFrom(ToastrModule.forRoot()),
+    provideCharts(withDefaultRegisterables())
   ]
 }).catch((err) => console.error(err));

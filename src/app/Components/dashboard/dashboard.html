@@ -3,46 +3,46 @@
         <h1>Welcome, User!</h1>
         <p>Here's a quick overview of your organization's resources.</p>
     </div>
-
-    <!-- <div class="landing-intro">
-        <h1>Welcome to the Resource Tracking Application</h1>
-        <p>
-            This application helps you efficiently manage and track employee resources within your organization.
-        </p>
-    </div> -->
-
     <div class="metrics-grid">
         <div class="metric-card">
             <h3>Total Employees</h3>
-            <p class="metric-value">245</p>
+            <p class="metric-value">{{ metrics.totalEmployees }}</p>
         </div>
         <div class="metric-card">
             <h3>Projects Active</h3>
-            <p class="metric-value">12</p>
+            <p class="metric-value">{{ metrics.projectsActive }}</p>
         </div>
         <div class="metric-card">
             <h3>Billable FTEs</h3>
-            <p class="metric-value">180</p>
+            <p class="metric-value">{{ metrics.billable_FTEs }}</p>
         </div>
         <div class="metric-card">
             <h3>Unassigned Employees</h3>
-            <p class="metric-value">6</p>
+            <p class="metric-value">{{ metrics.unassignedEmployees }}</p>
         </div>
     </div>
-
     <div class="chart-section">
         <div class="chart-card">
             <h2>Employee Distribution by Role</h2>
             <div class="chart-placeholder">
-                <!-- Placeholder for a chart, e.g., a pie chart or bar chart -->
-                <p>Pie Chart</p>
+                <canvas baseChart
+                        [data]="pieChartData"
+                        [labels]="pieChartLabels"
+                        [type]="pieChartType"
+                        [options]="pieChartOptions"
+                        [legend]="pieChartLegend">
+                </canvas>
             </div>
         </div>
         <div class="chart-card">
             <h2>Project Status</h2>
             <div class="chart-placeholder">
-                <!-- Placeholder for a chart, e.g., a bar chart -->
-                <p>Bar Chart</p>
+                <canvas baseChart
+                        [datasets]="barChartData"
+                        [labels]="barChartLabels"
+                        [type]="barChartType"
+                        [options]="barChartOptions">
+                </canvas>
             </div>
         </div>
     </div>
