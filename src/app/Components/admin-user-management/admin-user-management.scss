@@ -1,14 +1,66 @@
 .user-management-container {
-      padding: 2rem;
-    }
+  padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
+}
 
-    h2 {
-      font-size: 2rem;
-      color: #1e3a8a;
-      margin-bottom: 1rem;
-    }
+h2 {
+  font-size: 2rem;
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+}
 
-    p {
-      color: #555;
-      margin-bottom: 2rem;
-    }
+p {
+  color: #555;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* 🔹 Responsive rules (Mobile-first approach) */
+
+/* Small devices (phones, <600px) */
+@media (max-width: 600px) {
+  .user-management-container {
+    padding: 1rem; /* reduce padding */
+  }
+
+  h2 {
+    font-size: 1.5rem; /* smaller heading */
+    text-align: center;
+  }
+
+  p {
+    font-size: 0.9rem; /* smaller paragraph */
+    text-align: center;
+  }
+}
+
+/* Medium devices (tablets, 600px–1024px) */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .user-management-container {
+    padding: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+}
+
+/* Large devices (desktops, >1024px) */
+@media (min-width: 1025px) {
+  .user-management-container {
+    padding: 2rem 3rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  p {
+    font-size: 1.1rem;
+  }
+}

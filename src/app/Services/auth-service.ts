@@ -58,4 +58,11 @@ export class AuthService {
     }
     return null;
   }
+
+  // getAuth(data:any){
+  //   return this.http.get<any>(Environment.URI + 'Auth/GetAuthUser',data);
+  // }
+
+
+
 }

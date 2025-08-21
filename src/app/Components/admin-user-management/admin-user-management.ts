@@ -16,6 +16,7 @@ export interface User {
 
 @Component({
   selector: 'app-admin-user-management',
+  standalone:true,
   imports: [GridComponent,GridModule],
   templateUrl: './admin-user-management.html',
   styleUrl: './admin-user-management.scss'
@@ -54,8 +55,8 @@ export class AdminUserManagement implements OnInit{
     // Set up the headers with the authentication token
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
-    // Assuming a new API endpoint for fetching all users
-    this.http.get<User[]>(Environment.URI + 'Auth/users', { headers }).subscribe({
+    // API endpoint for fetching all users
+    this.http.get<User[]>(Environment.URI + 'Auth/GetAuthUser', { headers }).subscribe({
       next: (data: User[]) => {
         this.userList = data;
         this.applyGridState();
