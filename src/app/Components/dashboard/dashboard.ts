@@ -47,19 +47,31 @@ public barChartData: ChartDataset<'bar'>[] = [
     this.fetchDashboardData();
   }
 
-    fetchDashboardData(): void {
-    this.myServices.getDashboardData().subscribe(data => {
-      // Assign the metrics
-      this.metrics = data.metrics;
+fetchDashboardData(): void {
+  this.myServices.getDashboardData().subscribe(data => {
+    console.log("API Data:", data);
 
-      // Assign the pie chart data
-      this.pieChartLabels = data.employeeDistribution.map(item => item.role);
-      this.pieChartData.datasets[0].data = data.employeeDistribution.map(item => item.count);
+    // Metrics
+    this.metrics = {
+      totalEmployees: data.metrics.totalEmployees,
+      projectsActive: data.metrics.projectsActive,
+      billable_FTEs: data.metrics.billable_FTEs,
+      unassignedEmployees: data.metrics.unassignedEmployees
+    };
 
-      // Assign the bar chart data
-      this.barChartLabels = data.projectAssignments.map(item => item.project);
-      this.barChartData[0].data = data.projectAssignments.map(item => item.assignedEmployees);
-    });
-  }
+    // Pie Chart Data
+    this.pieChartData = {
+      labels: data.employeeDistribution.map((item: any) => item.role),
+      datasets: [{ data: data.employeeDistribution.map((item: any) => item.count) }]
+    };
+
+    // Bar Chart Data
+    this.barChartLabels = data.projectAssignments.map((item: any) => item.project);
+    this.barChartData = [
+      { data: data.projectAssignments.map((item: any) => item.assignedEmployees), label: 'Assigned Employees' }
+    ];
+  });
+}
+
 
 }

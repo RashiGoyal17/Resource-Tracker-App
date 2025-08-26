@@ -4,12 +4,12 @@ export function MapUserFormToResource(userform: any) {
         name: userform?.name,
         email: userform?.email,
         designation: userform?.designation,
-        reportingTo: userform?.reportingTo.join(","),
+        reportingTo: Array.isArray(userform?.reportingTo) ? userform.reportingTo.join(",") : userform.reportingTo,
         billable: userform?.billable === 'yes',
-        skill: userform?.skill.join(","),
-        project: userform?.project.join(","),
+        skill: Array.isArray(userform?.skill) ? userform.skill.join(",") : userform.skill,
+        project: Array.isArray(userform?.project) ? userform.project.join(",") : userform.project,
         location: userform?.location,
-        doj: userform?.doj,
+        doj: userform?.doj, 
         remarks: userform?.remarks,
     }
 }

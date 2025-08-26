@@ -17,7 +17,7 @@
       <li><a routerLink="/Home" routerLinkActive="active">Home</a></li>
       <li>
         <a *ngIf="!IsEmployee()" 
-          [routerLink]="selectedEmployeeId ? ['/Edit', selectedEmployeeId] : ['/Edit']"
+          [routerLink]="selectedEmployeeId ? ['/Edit', selectedEmployeeId] : ['/Add']"
           routerLinkActive="active">
           Form
         </a>

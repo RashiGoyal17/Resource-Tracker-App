@@ -1,9 +1,24 @@
+<!-- home.html -->
 <div class="Kendo-grid-container">
-  <kendo-grid [kendoGridBinding]="userList" [skip]="0" [pageSize]="gridState.take!" [pageable]="true" [sortable]="true"
-    [filterable]="true" (dataStateChange)="onDataStateChange($event)" [selectable]="{
-    mode: 'multiple',
-    metaKeyMultiSelect: requireSelectOrCtrlKeys
-  }" [selectedKeys]="selectedKeys" (selectionChange)="onSelectionChange($event)" kendoGridSelectBy="empId">
+  <!-- Server-side paging configuration -->
+  <kendo-grid 
+    [data]="gridView"
+    [pageSize]="gridState.take" 
+    [skip]="gridState.skip" 
+    [sort]="gridState.sort" 
+    [filter]="gridState.filter" 
+    [sortable]="true" 
+    [filterable]="true" 
+    [pageable]="true" 
+    [loading]="loading"
+    (dataStateChange)="onDataStateChange($event)" 
+    [selectable]="{
+      mode: 'multiple',
+      metaKeyMultiSelect: requireSelectOrCtrlKeys
+    }" 
+    [selectedKeys]="selectedKeys" 
+    (selectionChange)="onSelectionChange($event)" 
+    kendoGridSelectBy="empId">
 
     <kendo-toolbar overflow="scroll">
       <kendo-toolbar-button kendoGridFilterTool></kendo-toolbar-button>
@@ -12,9 +27,10 @@
       <kendo-toolbar-separator></kendo-toolbar-separator>
       <kendo-toolbar-button kendoGridColumnChooserTool></kendo-toolbar-button>
       <kendo-toolbar-spacer></kendo-toolbar-spacer>
-      <kendo-toolbar-button *ngIf="!IsEmployee()" id="Delete-btn" [text]="'Delete'" (click)="onDeleteMultiple()"></kendo-toolbar-button>
-      <kendo-toolbar-button *ngIf="!IsEmployee()" [text]="'Bulk Edit'" (click)="onBulkEdit()" [disabled]="!selectedKeys.length"></kendo-toolbar-button>
-      <kendo-toolbar-button *ngIf="!IsEmployee()" class="import-btn" (click)="onImportExcel()" [text]="'Import Excel'"></kendo-toolbar-button>
+      <kendo-toolbar-button *ngIf="!IsEmployee()" id="Delete-btn" text="Delete" (click)="onDeleteMultiple()" [disabled]="!selectedKeys.length"></kendo-toolbar-button>
+      <kendo-toolbar-button *ngIf="!IsEmployee()" text="Bulk Edit" (click)="onBulkEdit()" [disabled]="!selectedKeys.length"></kendo-toolbar-button>
+      <kendo-toolbar-button *ngIf="!IsEmployee()" class="import-btn" (click)="onImportExcel()" text="Import Excel"></kendo-toolbar-button>
+      <!-- <kendo-toolbar-button *ngIf="!IsEmployee()" text="Add New" (click)="onAddNew()"></kendo-toolbar-button> -->
     </kendo-toolbar>
 
     <kendo-grid-checkbox-column [showSelectAll]="true" [width]="25"></kendo-grid-checkbox-column>
@@ -29,80 +45,132 @@
     <kendo-grid-column field="designation" title="Role" [width]="140"></kendo-grid-column>
     <kendo-grid-column field="project" title="Project" [width]="180"></kendo-grid-column>
 
-      <!-- Hidden by default, available in Column Chooser -->
-  <kendo-grid-column field="email" title="Email" [width]="180" [hidden]="true"></kendo-grid-column>
-  <kendo-grid-column field="reportingTo" title="Reporting To" [width]="150" [hidden]="true"></kendo-grid-column>
-  <kendo-grid-column field="billable" title="Billable" [width]="100" [hidden]="true"></kendo-grid-column>
-  <kendo-grid-column field="skill" title="Skill" [width]="130" [hidden]="true"></kendo-grid-column>
-  <kendo-grid-column field="location" title="Location" [width]="130" [hidden]="true"></kendo-grid-column>
-  <kendo-grid-column field="doj" title="Date of Joining" [width]="140" [hidden]="true">
-    <ng-template kendoGridCellTemplate let-dataItem>
-      {{ dataItem.doj | date: 'yyyy-MM-dd' }}
-    </ng-template>
-  </kendo-grid-column>
-  <kendo-grid-column field="remarks" title="Remarks" [width]="200" [hidden]="true"></kendo-grid-column>
-
-    <kendo-grid-column title="Actions" [width]="150">
+    <!-- Hidden by default, available in Column Chooser -->
+    <kendo-grid-column field="email" title="Email" [width]="180" [hidden]="true"></kendo-grid-column>
+    <kendo-grid-column field="reportingTo" title="Reporting To" [width]="150" [hidden]="true"></kendo-grid-column>
+    <kendo-grid-column field="billable" title="Billable" [width]="100" [hidden]="true"></kendo-grid-column>
+    <kendo-grid-column field="skill" title="Skill" [width]="130" [hidden]="true"></kendo-grid-column>
+    <kendo-grid-column field="location" title="Location" [width]="130" [hidden]="true"></kendo-grid-column>
+    <kendo-grid-column field="doj" title="Date of Joining" [width]="140" [hidden]="true">
       <ng-template kendoGridCellTemplate let-dataItem>
-        <button *ngIf="!IsEmployee()" class="action-btn edit" (click)="onEdit(dataItem)" title="Edit">✏️</button>
-        <button class="action-btn details" (click)="onMore(dataItem)" title="Details">👁️</button>
-        <button *ngIf="!IsEmployee()"
-        class="action-btn delete" (click)="onDel(dataItem.empId!)" title="Delete">🗑️</button>
+        {{ dataItem.doj | date: 'yyyy-MM-dd' }}
+      </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="remarks" title="Remarks" [width]="200" [hidden]="true"></kendo-grid-column>
+
+    <kendo-grid-column title="Actions" [width]="150" [sortable]="false" [filterable]="false">
+      <ng-template kendoGridCellTemplate let-dataItem>
+        <button *ngIf="!IsEmployee()" kendoButton class="action-btn edit" (click)="onEdit(dataItem)" title="Edit">✏️</button>
+        <button kendoButton class="action-btn details" (click)="onMore(dataItem)" title="Details">👁️</button>
+        <button *ngIf="!IsEmployee()" kendoButton class="action-btn delete" (click)="onDel(dataItem.empId!)" title="Delete">🗑️</button>
       </ng-template>
     </kendo-grid-column>
   </kendo-grid>
 </div>
 
-<kendo-dialog  *ngIf="showBulkEditModal" title="Bulk Edit Employees" (close)="closeBulkEditModal()">
+<!-- Bulk Edit Modal -->
+<kendo-dialog *ngIf="showBulkEditModal" title="Bulk Edit Employees" (close)="closeBulkEditModal()" [width]="600">
   <form [formGroup]="bulkEditForm" (ngSubmit)="onBulkEditSubmit()">
+    <div class="form-container">
+      <div class="form-row">
+        <kendo-label text="Designation:" class="form-label">
+          <kendo-dropdownlist 
+            formControlName="designation" 
+            [data]="designations" 
+            [valuePrimitive]="true" 
+            [defaultItem]="'-- Select --'"
+            class="form-control">
+          </kendo-dropdownlist>
+        </kendo-label>
+      </div>
 
-    <label>Designation:
-      <select formControlName="designation">
-        <option value="">-- Select --</option>
-        <option *ngFor="let des of designations" [value]="des">{{ des }}</option>
-      </select>
-    </label>
+      <div class="form-row">
+        <kendo-label text="Location:" class="form-label">
+          <kendo-dropdownlist 
+            formControlName="location" 
+            [data]="locations" 
+            [valuePrimitive]="true" 
+            [defaultItem]="'-- Select --'"
+            class="form-control">
+          </kendo-dropdownlist>
+        </kendo-label>
+      </div>
 
-    <label>Location:
-      <select formControlName="location">
-        <option value="">-- Select --</option>
-        <option *ngFor="let loc of locations" [value]="loc">{{ loc }}</option>
-      </select>
-    </label>
+      <div class="form-row">
+        <kendo-label text="Billable:" class="form-label">
+          <kendo-dropdownlist 
+            formControlName="billable" 
+            [data]="[{text: '-- Select --', value: ''}, {text: 'Yes', value: 'yes'}, {text: 'No', value: 'no'}]" 
+            textField="text" 
+            valueField="value"
+            class="form-control">
+          </kendo-dropdownlist>
+        </kendo-label>
+      </div>
 
-    <label>Billable:
-      <select formControlName="billable">
-        <option value="">-- Select --</option>
-        <option value="yes">Yes</option>
-        <option value="no">No</option>
-      </select>
-    </label>
+      <div class="form-row">
+        <kendo-label text="Skills:" class="form-label">
+          <kendo-multiselect 
+            formControlName="skill" 
+            [data]="skills" 
+            [valuePrimitive]="true" 
+            placeholder="Select skills..."
+            class="form-control">
+          </kendo-multiselect>
+        </kendo-label>
+      </div>
 
-    <label>Skills:
-  <kendo-multiselect formControlName="skill" [data]="skills" [valuePrimitive]="true"></kendo-multiselect>
-</label>
+      <div class="form-row">
+        <kendo-label text="Projects:" class="form-label">
+          <kendo-multiselect 
+            formControlName="project" 
+            [data]="projects" 
+            [valuePrimitive]="true" 
+            placeholder="Select projects..."
+            class="form-control">
+          </kendo-multiselect>
+        </kendo-label>
+      </div>
 
-<label>Projects:
-  <kendo-multiselect formControlName="project" [data]="projects" [valuePrimitive]="true"></kendo-multiselect>
-</label>
+      <div class="form-row">
+        <kendo-label text="Managers:" class="form-label">
+          <kendo-multiselect 
+            formControlName="reportingTo" 
+            [data]="managers" 
+            [valuePrimitive]="true" 
+            placeholder="Select managers..."
+            class="form-control">
+          </kendo-multiselect>
+        </kendo-label>
+      </div>
 
-<label>Managers:
-  <kendo-multiselect formControlName="ReportingTo" [data]="managers" [valuePrimitive]="true"></kendo-multiselect>
-</label>
+      <div class="form-row">
+        <kendo-label text="Date of Joining:" class="form-label">
+          <kendo-datepicker 
+            formControlName="doj"
+            class="form-control">
+          </kendo-datepicker>
+        </kendo-label>
+      </div>
 
-<label>Remarks:
-  <textarea formControlName="remarks"></textarea>
-</label>
-
-<label>Date of Joining:
-  <input type="date" formControlName="doj" />
-</label>
-
-
-    <div class="dialog-actions">
-      <button kendoButton type="submit">Apply Changes</button>
-      <button kendoButton type="button" (click)="closeBulkEditModal()">Cancel</button>
+      <div class="form-row">
+        <kendo-label text="Remarks:" class="form-label">
+          <kendo-textarea 
+            formControlName="remarks" 
+            [rows]="3"
+            class="form-control">
+          </kendo-textarea>
+        </kendo-label>
+      </div>
     </div>
 
+    <div class="dialog-actions">
+      <button kendoButton type="submit" [primary]="true" [disabled]="loading">
+        Apply Changes
+      </button>
+      <button kendoButton type="button" (click)="closeBulkEditModal()">
+        Cancel
+      </button>
+    </div>
   </form>
 </kendo-dialog>

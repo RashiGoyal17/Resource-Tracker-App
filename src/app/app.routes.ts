@@ -25,7 +25,7 @@ export const routes: Routes = [
       { path: 'Details', component: Details },
       { path: 'Details/:empId', component: Details },
       { path: 'Add', component: Form, canActivate: [roleguardGuard], data: { allowedRoles: ['Admin', 'Manager'] } },
-      { path: 'Edit', component: Form, canActivate: [roleguardGuard], data: { allowedRoles: ['Admin', 'Manager'] } },
+      // { path: 'Edit', component: Form, canActivate: [roleguardGuard], data: { allowedRoles: ['Admin', 'Manager'] } },
       { path: 'CreateUser', component: CreateUser, canActivate: [roleguardGuard], data: { allowedRoles: ['Admin'] } },
       { path: 'Edit/:empId', component: Form, canActivate: [roleguardGuard], data: { allowedRoles: ['Admin', 'Manager'] } },
       { path: 'user-management', component: AdminUserManagement, canActivate: [roleguardGuard], data: { allowedRoles: ['Admin'] } },

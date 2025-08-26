@@ -1,332 +1,411 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { KENDO_GRID, KENDO_GRID_EXCEL_EXPORT, KENDO_GRID_PDF_EXPORT } from '@progress/kendo-angular-grid';
+import { DataStateChangeEvent, GridDataResult, GridModule } from '@progress/kendo-angular-grid';
 import { Employee } from '../../Interface/Interface';
 import { MyServices } from '../../Services/my-services';
 import { Router } from '@angular/router';
-import { process, State } from '@progress/kendo-data-query';
+import { State } from '@progress/kendo-data-query';
 import { FormsModule, FormGroup, FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { KENDO_LABELS } from '@progress/kendo-angular-label';
-import { KENDO_INPUTS } from '@progress/kendo-angular-inputs';
-import { KENDO_TOOLBAR } from "@progress/kendo-angular-toolbar";
-import { ExcelExportData } from "@progress/kendo-angular-excel-export";
 import { ExportServices } from '../../Services/export-services';
-import { GridModule } from '@progress/kendo-angular-grid';
 import { DialogModule } from '@progress/kendo-angular-dialog';
+import { ToolBarModule } from '@progress/kendo-angular-toolbar';
+import { ButtonsModule } from '@progress/kendo-angular-buttons';
+import { LabelModule } from '@progress/kendo-angular-label';
+import { InputsModule } from '@progress/kendo-angular-inputs';
+import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import * as XLSX from 'xlsx';
-import { MultiSelectModule } from '@progress/kendo-angular-dropdowns';
+import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../Services/auth-service';
-
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule,
+  imports: [
+    CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     GridModule,
     DialogModule,
-    ReactiveFormsModule,
-    KENDO_GRID_EXCEL_EXPORT,
-    KENDO_GRID_PDF_EXPORT,
-    KENDO_GRID,
-    KENDO_TOOLBAR,
-    KENDO_LABELS,
-    KENDO_INPUTS,
-    MultiSelectModule
+    ToolBarModule,
+    ButtonsModule,
+    LabelModule,
+    InputsModule,
+    DateInputsModule,
+    DropDownsModule
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
 export class Home implements OnInit {
-
   bulkEditForm!: FormGroup;
-
   showBulkEditModal: boolean = false;
+  displayModal: boolean = false;
+  requireSelectOrCtrlKeys: boolean = false;
 
+  // Dropdown data
   designations: string[] = [];
   locations: string[] = [];
   skills: string[] = [];
   projects: string[] = [];
   managers: string[] = [];
 
+  // Server-side grid configuration
+  public gridView: GridDataResult = { data: [], total: 0 };
+  public selectedKeys: number[] = [];
+  public loading: boolean = false;
 
-  gridData: { data: Employee[], total: number } = {
-    data: [],
-    total: 0
-  };
-
-
-  displayModal: boolean = false;
-
-  gridState: State = {
+  public gridState: State = {
     skip: 0,
-    take: 7,
+    take: 10,
     sort: [],
-    filter: {
-      logic: 'and',
-      filters: []
-    }
+    filter: { logic: 'and', filters: [] },
+    group: []
   };
 
-  userList: Employee[] = [];
-  constructor(private fb: FormBuilder, private empService: MyServices, 
-    private router: Router, private exportService: ExportServices, private authService: AuthService,private toastr: ToastrService) { }
-  ngOnInit() {
-    this.empService.getAll().subscribe((list: any) => {
-      console.log(list);
-      this.userList = list;
-      this.exportService.setEmployees(this.userList);
-      this.loadGridData();
-    });
+  constructor(
+    private fb: FormBuilder, 
+    private empService: MyServices,
+    private router: Router, 
+    private exportService: ExportServices, 
+    private authService: AuthService, 
+    private toastr: ToastrService
+  ) {}
 
+  ngOnInit(): void {
+    this.initializeBulkEditForm();
+    this.loadInitialData();
+    this.loadData();
+  }
+
+  private initializeBulkEditForm(): void {
     this.bulkEditForm = this.fb.group({
       designation: [''],
       location: [''],
       billable: [''],
-      skill: [[]],        // multiselect
+      skill: [[]],
       project: [[]],
-      ReportingTo: [[]],
+      reportingTo: [[]],
       doj: [''],
       remarks: ['']
     });
-
-    this.loadInitialData();
-
   }
 
-  onBulkEdit() {
-    this.bulkEditForm.reset();
-    this.loadInitialData();
-    this.showBulkEditModal = true;
+  private loadData(): void {
+    this.loading = true;
+    this.empService.getGridData(this.gridState).subscribe({
+      next: (response: any) => {
+        console.log("Grid API response:", response);
+        
+        // Handle different response formats from server
+        let data: Employee[] = [];
+        let total: number = 0;
+
+        if (response.Data && response.Total !== undefined) {
+          // Format: { Data: [...], Total: number }
+          data = response.Data;
+          total = response.Total;
+        } else if (response.data && response.total !== undefined) {
+          // Format: { data: [...], total: number }
+          data = response.data;
+          total = response.total;
+        } else if (Array.isArray(response)) {
+          // Format: [...]
+          data = response;
+          total = response.length;
+        } else {
+          console.warn('Unexpected response format:', response);
+        }
+
+        this.gridView = {
+          data: data.map((emp: any) => ({
+            ...emp,
+            billable: emp.billable ? 'yes' : 'no' // Normalize for UI
+          })),
+          total: total
+        };
+
+        this.exportService.setEmployees(this.gridView.data);
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Failed to load grid data:', error);
+        this.toastr.error('Failed to load grid data', 'Error');
+        this.gridView = { data: [], total: 0 };
+        this.loading = false;
+      }
+    });
   }
 
+  private loadInitialData(): void {
+    const requests = {
+      designations: this.empService.getDesignations(),
+      locations: this.empService.getLocations(),
+      skills: this.empService.getSkills(),
+      projects: this.empService.getProjects(),
+      managers: this.empService.getManagers()
+    };
 
-  closeBulkEditModal() {
-    this.showBulkEditModal = false;
+    forkJoin(requests).subscribe({
+      next: (results) => {
+        this.designations = results.designations;
+        this.locations = results.locations;
+        this.skills = results.skills;
+        this.projects = results.projects;
+        this.managers = results.managers;
+      },
+      error: (error) => {
+        console.error('Failed to load initial data:', error);
+      }
+    });
   }
 
-  loadGridData() {
-    const processed = process(this.userList, this.gridState);
-    this.gridData.data = processed.data;
-    this.gridData.total = processed.total;
+  onDataStateChange(state: DataStateChangeEvent): void {
+    console.log('Data state changed:', state);
+    this.gridState = state;
+    this.loadData(); // Fetch new data from server
   }
 
-  IsEmployee() : boolean{
+  IsEmployee(): boolean {
     return this.authService.getRole() === "Employee";
   }
 
-
-  onDataStateChange(state: State): void {
-    this.gridState = state;
-    this.loadGridData();
-  }
-
-  onEdit(employee: Employee) {
-    debugger
+  onEdit(employee: Employee): void {
     console.log("Employee", employee);
-    this.empService.setSelectedEmployee(employee)
+    this.empService.setSelectedEmployee(employee);
     this.router.navigate(['/Edit', employee.empId]);
   }
-  onMore(employee: Employee) {
-    this.empService.setSelectedEmployee(employee)
+
+  onMore(employee: Employee): void {
+    this.empService.setSelectedEmployee(employee);
     this.router.navigate(['/Details', employee.empId]);
   }
 
-  onDel(empId: number) {
-    const delConfirm = confirm('Are you sure you want to delete?')
+  onDel(empId: number): void {
+    const delConfirm = confirm('Are you sure you want to delete?');
     if (delConfirm) {
-      this.empService.delete(empId).subscribe(() => {
-        this.empService.setSelectedEmployee(null)
-        this.userList = this.userList.filter(u => u.empId !== empId);
-        this.loadGridData(); // Refresh grid
-        this.DeleteResource();
-        console.log('Employee deleted successfully');
-        // Show success message
-        this.toastr.success('Employee deleted successfully', 'Success');
-      }, error => {
-        this.toastr.error('Failed to delete employee', 'Error');
-        console.error('Delete failed', error);
-      })}
+      this.empService.delete(empId).subscribe({
+        next: () => {
+          this.empService.setSelectedEmployee(null);
+          this.loadData(); // Refresh server-side data
+          this.toastr.success('Employee deleted successfully', 'Success');
+          console.log('Employee deleted successfully');
+        },
+        error: (error) => {
+          console.error('Delete failed', error);
+          this.toastr.error('Failed to delete employee', 'Error');
+        }
+      });
+    }
   }
 
-  onDeleteMultiple() {
-    const delConfirm = confirm('Are you sure you want to delete?')
+  onDeleteMultiple(): void {
+    if (this.selectedKeys.length === 0) {
+      this.toastr.warning('No employees selected', 'Warning');
+      return;
+    }
+
+    const delConfirm = confirm(`Are you sure you want to delete ${this.selectedKeys.length} employee(s)?`);
     if (delConfirm) {
-      this.selectedKeys.forEach((empId: number) => {
-        this.empService.delete(empId).subscribe(() => {
-          this.userList = this.userList.filter(u => u.empId !== empId);
-          this.loadGridData(); // Refresh grid
-          this.DeleteResource();
-        });
-      this.toastr.success('Employee deleted successfully', 'Success');
-      }, (error: any) => {
-        this.toastr.error('Failed to delete employee', 'Error');
-        console.error('Delete failed', error);
-      })}
+      const deleteObservables = this.selectedKeys.map(empId => 
+        this.empService.delete(empId)
+      );
+
+      forkJoin(deleteObservables).subscribe({
+        next: () => {
+          this.loadData(); // Refresh server-side data
+          this.selectedKeys = [];
+          this.toastr.success('Employees deleted successfully', 'Success');
+        },
+        error: (error) => {
+          console.error('Bulk delete failed', error);
+          this.toastr.error('Failed to delete some employees', 'Error');
+        }
+      });
+    }
   }
-
-  DeleteResource() {
-    this.displayModal = true;
-  }
-
-
-  requireSelectOrCtrlKeys: boolean = false;
-
-  selectedKeys: any = [];
 
   onSelectionChange(event: any): void {
-    const newLySelectedRows = event.selectedRows.map((row: any) => row.dataItem.empId);
-    const newLyDeSelectedRows: Array<number> = event.deselectedRows.map((row: any) => row.dataItem.empId);
+    const newlySelectedRows = event.selectedRows.map((row: any) => row.dataItem.empId);
+    const newlyDeselectedRows: number[] = event.deselectedRows.map((row: any) => row.dataItem.empId);
 
-    this.selectedKeys = this.selectedKeys.filter((empId: number) => !newLyDeSelectedRows.includes(empId));
+    // Remove deselected items
+    this.selectedKeys = this.selectedKeys.filter((empId: number) => 
+      !newlyDeselectedRows.includes(empId)
+    );
 
-    newLySelectedRows.forEach((newLySelectedId: number) => {
-      if (!this.selectedKeys.includes(newLySelectedId)) {
-        this.selectedKeys.push(newLySelectedId);
+    // Add newly selected items
+    newlySelectedRows.forEach((newlySelectedId: number) => {
+      if (!this.selectedKeys.includes(newlySelectedId)) {
+        this.selectedKeys.push(newlySelectedId);
       }
-    })
+    });
 
-    console.log(this.selectedKeys);
-    console.log("Selected Rows Data:", event.selectedRows.map((row: any) => row.dataItem));
-      console.log('Selected employee(s):', newLySelectedRows);
+    console.log('Selected Keys:', this.selectedKeys);
 
-  // 👉 Set the first selected employee as the active one for PDF export
-  if (newLySelectedRows.length > 0) {
-    const selectedEmployeeObj = event.selectedRows[0]?.dataItem;
-    this.empService.setSelectedEmployee(selectedEmployeeObj);
-  } else {
-    this.empService.setSelectedEmployee(null);
+    // Set the first selected employee as active
+    if (newlySelectedRows.length > 0) {
+      const selectedEmployeeObj = event.selectedRows[0]?.dataItem;
+      this.empService.setSelectedEmployee(selectedEmployeeObj);
+    } else if (this.selectedKeys.length === 0) {
+      this.empService.setSelectedEmployee(null);
+    }
   }
 
+  // onAddNew(): void {
+  //   this.router.navigate(['/form']);
+  //   this.empService.setSelectedEmployee(null);
+  // }
 
-
+  onBulkEdit(): void {
+    if (this.selectedKeys.length === 0) {
+      this.toastr.warning('Please select employees to edit', 'Warning');
+      return;
+    }
+    this.bulkEditForm.reset();
+    this.showBulkEditModal = true;
   }
 
-  onAddNew() {
-    this.router.navigate(['/form']); // Route without empId
-    this.empService.setSelectedEmployee(null); // Clear context
+  closeBulkEditModal(): void {
+    this.showBulkEditModal = false;
   }
 
-  loadInitialData() {
-    this.empService.getDesignations().subscribe(d => this.designations = d);
-    this.empService.getLocations().subscribe(l => this.locations = l);
-    this.empService.getSkills().subscribe(s => this.skills = s); // ✅ Ensure API exists
-    this.empService.getProjects().subscribe(p => this.projects = p);
-    this.empService.getManagers().subscribe(m => this.managers = m);
+  onBulkEditSubmit(): void {
+  if (this.selectedKeys.length === 0) {
+    this.toastr.warning('No employees selected', 'Warning');
+    return;
   }
 
+  const formData = this.bulkEditForm.value;
 
-  onBulkEditSubmit() {
-    const formData = this.bulkEditForm.value;
+  // Create payload with only non-empty values
+  const payload: any = {};
 
-    const payload: any = {
-      designation: formData.designation,
-      location: formData.location,
-      billable: formData.billable === 'yes',
-      skill: (formData.skill || []).join(','),
-      project: (formData.project || []).join(','),
-      ReportingTo: (formData.ReportingTo || []).join(','),
-      doj: formData.doj !== '' ? new Date(formData.doj).toISOString().split('T')[0] : null,
-      remarks: formData.remarks
-    };
-
-
-    const updateObservables = this.selectedKeys.map((empId: number) => {
-      const employee: any = this.userList.find(u => u.empId === empId);
-      if (!employee) return;
-
-      const updated: any = {
-        ...employee,
-        ...payload,
-        empId: empId // explicitly set to match backend expectations
-      };
-
-      for (const key in payload) {
-        if (payload[key] === '' || payload[key] === null || payload[key] === undefined) {
-          updated[key] = employee[key]; // Remove keys with empty values
-        }
-      }
-
-      return this.empService.update(empId, updated);
-    }).filter(Boolean); // remove undefined
-
-    Promise.all(updateObservables.map((obs: any) => obs.toPromise()))
-      .then(() => {
-        // alert('Bulk update successful');
-        this.toastr.success('Bulk update successful', 'Success');
-        this.closeBulkEditModal();
-        this.empService.getAll().subscribe((list: any) => {
-          this.userList = list;
-          this.loadGridData();
-        });
-      })
-      .catch(error => {
-        console.error('Bulk update failed', error);
-        // alert('Bulk update failed. Please try again.');
-        this.toastr.error('Bulk update failed. Please try again.', 'Error');
-      });
+  if (formData.designation) payload.designation = formData.designation;
+  if (formData.location) payload.location = formData.location;
+  if (formData.billable) payload.billable = formData.billable === 'yes';
+  if (formData.skill && formData.skill.length > 0) payload.skill = formData.skill.join(',');
+  if (formData.project && formData.project.length > 0) payload.project = formData.project.join(',');
+  if (formData.reportingTo && formData.reportingTo.length > 0) {
+    payload.reportingTo = formData.reportingTo.join(',');
   }
+  if (formData.doj) payload.doj = new Date(formData.doj).toISOString().split('T')[0];
+  if (formData.remarks) payload.remarks = formData.remarks;
+
+  // Build full update objects
+const updateObservables = this.selectedKeys.map((empId: number) => {
+  const existingEmployee = this.gridView.data.find((e: any) => e.empId === empId);
+
+  const updated = {
+    ...existingEmployee,
+    ...payload,
+    empId,
+    billable: payload.billable !== undefined 
+      ? payload.billable  // already true/false
+      : existingEmployee.billable === 'yes' // normalize UI back to boolean
+  };
+
+  return this.empService.update(empId, updated); // <-- send raw Employee object
+});
 
 
-  onImportExcel() {
+  forkJoin(updateObservables).subscribe({
+    next: () => {
+      this.toastr.success('Bulk update successful', 'Success');
+      this.closeBulkEditModal();
+      this.loadData(); // Refresh server-side data
+      this.selectedKeys = [];
+    },
+    error: (error) => {
+      console.error('Bulk update failed', error);
+      this.toastr.error('Bulk update failed. Please try again.', 'Error');
+    }
+  });
+}
+
+
+  onImportExcel(): void {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.xlsx';
+    input.accept = '.xlsx,.xls';
 
     input.onchange = async (e: any) => {
       const file = e.target.files[0];
-
       if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = (evt: any) => {
-        const data = new Uint8Array(evt.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
+      try {
+        const reader = new FileReader();
+        reader.onload = (evt: any) => {
+          try {
+            const data = new Uint8Array(evt.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
 
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
 
-        const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
+            const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
-        const employees = jsonData.map((row: any): any => ({
-          name: row["name"] || '',
-          email: row["email"] || '',
-          designation: row["designation"] || '',
-          reportingTo: (row["reportingTo"] || '').split(',').map((s: string) => s.trim()).filter((s: string) => s),
-          billable: (row["billable"] || '').toLowerCase() === 'yes',
-          skill: (row["skill"] || '').split(',').map((s: string) => s.trim()).filter((s: string) => s),
-          project: (row["project"] || '').split(',').map((s: string) => s.trim()).filter((s: string) => s),
-          location: row["location"] || '',
-          doj: row["doj"] ? new Date(row["doj"]).toISOString().split('T')[0] : null,
-          remarks: row["remarks"] || ''
-        }));
+            const employees = jsonData.map((row: any): any => {
+              const normalizedRow: any = {};
+              Object.keys(row).forEach(k => {
+                normalizedRow[k.toLowerCase().trim()] = row[k];
+              });
 
+              let doj: string | null = null;
+              if (normalizedRow["doj"]) {
+                if (typeof normalizedRow["doj"] === "number") {
+                  const parsed = XLSX.SSF.parse_date_code(normalizedRow["doj"]);
+                  doj = `${parsed.y}-${String(parsed.m).padStart(2, '0')}-${String(parsed.d).padStart(2, '0')}`;
+                } else {
+                  doj = new Date(normalizedRow["doj"]).toISOString().split("T")[0];
+                }
+              }
 
-        const transformedEmployees = employees.map(emp => ({
-          ...emp,
-          reportingTo: Array.isArray(emp.reportingTo) ? emp.reportingTo.join(', ') : '',
-          skill: Array.isArray(emp.skill) ? emp.skill.join(', ') : '',
-          project: Array.isArray(emp.project) ? emp.project.join(', ') : ''
-        }));
+              return {
+                empId: null,
+                name: normalizedRow["name"] || '',
+                email: normalizedRow["email"] || '',
+                designation: normalizedRow["designation"] || '',
+                ReportingTo: (normalizedRow["reportingto"] || '').toString().split(',').map((s: string) => s.trim()).filter((s: string) => s).join(', '),
+                billable: (normalizedRow["billable"] || '').toString().toLowerCase() === 'yes',
+                skill: (normalizedRow["skill"] || '').toString().split(',').map((s: string) => s.trim()).filter((s: string) => s).join(', '),
+                project: (normalizedRow["project"] || '').toString().split(',').map((s: string) => s.trim()).filter((s: string) => s).join(', '),
+                location: normalizedRow["location"] || '',
+                doj: doj,
+                remarks: normalizedRow["remarks"] || ''
+              };
+            });
 
-        this.empService.bulkAddEmployees(transformedEmployees).subscribe(() => {
-          // alert("Employees added successfully");
-          this.toastr.success('Employees imported successfully', 'Success');
-          this.empService.getAll().subscribe((list: any) => {
-            this.userList = list;
-            this.loadGridData();
-          });
-        },error=>{
-        this.toastr.error('Failed to import employees', 'Error');
-        console.error(error);
-        });
-      };
+            console.log('Processed employees for backend:', employees);
 
-      reader.readAsArrayBuffer(file);
+            this.empService.bulkAddEmployees(employees).subscribe({
+              next: (response) => {
+                console.log('Backend response:', response);
+                this.toastr.success(`${employees.length} employees imported successfully`, 'Success');
+                this.loadData(); // Refresh server-side data
+              },
+              error: (error) => {
+                console.error('Bulk import error:', error);
+                this.toastr.error('Failed to import employees', 'Error');
+                if (error.error) {
+                  console.error('Backend error details:', error.error);
+                }
+              }
+            });
+          } catch (parseError) {
+            console.error('Error parsing Excel file:', parseError);
+            this.toastr.error('Error parsing Excel file', 'Error');
+          }
+        };
+
+        reader.readAsArrayBuffer(file);
+      } catch (error) {
+        console.error('Error reading file:', error);
+        this.toastr.error('Error reading file', 'Error');
+      }
     };
 
     input.click();
   }
-
 }

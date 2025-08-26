@@ -93,7 +93,7 @@ exportToPDF(employee: Employee): void {
     ['Email', safe(employee.email)],
     ['Location', safe(employee.location)],
     ['DOJ', formattedDate],
-    ['Reporting To', safe(employee.reportingTo)],
+    ['Reporting To', safe(employee.ReportingTo)],
     ['Billable', employee.billable ? 'Yes' : 'No'],
     ['Skill(s)', safe(employee.skill)],
     ['Remarks', safe(employee.remarks)]

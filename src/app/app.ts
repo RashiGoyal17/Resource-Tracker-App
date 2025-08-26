@@ -6,11 +6,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MyServices } from './Services/my-services';
 import { AuthService } from './Services/auth-service';
+import { GridModule } from '@progress/kendo-angular-grid';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ToastrModule, RouterOutlet, CommonModule],
+  imports: [ToastrModule, RouterOutlet, CommonModule,GridModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

@@ -38,7 +38,7 @@ export class Form {
   skills: any[] = [];
   projects: any[] = [];
   managers: any[] = [];
- 
+
   selectedSkills: string[] = [];
   showDropdown = false;
 
@@ -53,55 +53,51 @@ export class Form {
 
 
   ngOnInit() {
-
     this.loadDropdowns();
-
     this.initForm();
 
-    this.empservices.getSelectedEmployee().subscribe((employee) => {
-      if (employee) {
-        this.userform.patchValue(employee);
+    // Check if we are on Add or Edit
+    this.route.url.subscribe(urlSegments => {
+      const isAddRoute = urlSegments.some(seg => seg.path.toLowerCase() === 'add');
+      if (isAddRoute) {
+        // Add Mode
+        this.isEditMode = false;
+        this.empservices.setSelectedEmployee(null); // clear previously selected employee
+        this.userform.reset();
+        this.originalFormData = this.userform.value;
+        return; // exit here, don't run edit logic
       }
-    })
+    });
 
+    // Edit Mode → only if empId exists
     this.route.params.subscribe((val) => {
       this.empId = val["empId"];
       this.isEditMode = !!this.empId;
 
       if (this.isEditMode) {
         this.empservices.get(this.empId!).subscribe((emp: any) => {
-          debugger
           if (emp.doj) {
             emp.doj = this.formatDateForInput(emp.doj);
           }
-          console.log(emp);
 
           emp.project = emp.project?.split(',') ?? [];
           emp.skill = emp.skill?.split(',') ?? [];
           emp.reportingTo = emp.reportingTo?.split(',') ?? [];
 
-          if (emp.billable) {
-            emp.billable = "yes"
-          } else {
-            emp.billable = "no"
-          }
+          emp.billable = emp.billable ? "yes" : "no";
 
           const { empId, ...rest } = emp;
           this.originalFormData = JSON.parse(JSON.stringify(rest));
 
           this.userform.patchValue(emp);
-          debugger
           this.selectedProjects = emp.project;
-          this.selectedSkills = emp.skill
+          this.selectedSkills = emp.skill;
           this.selectedManagers = emp.reportingTo;
-
         });
-      } else {
-        this.originalFormData = this.userform.value;
       }
     });
-    
   }
+
 
   private formatDateForInput(dateStr: string): string {
     const date = new Date(dateStr);
@@ -124,7 +120,7 @@ export class Form {
       next: (data) => {
         this.locations = data;
         console.log("LOCATIONS", data);
-        
+
       },
       error: (err) => {
         console.error('Error fetching locations', err);
@@ -146,7 +142,7 @@ export class Form {
       next: (data) => {
         this.projects = data;
         console.log("PROJECTS", data);
-        
+
       },
       error: (err) => {
         console.error('Error fetching projects', err);
@@ -157,7 +153,7 @@ export class Form {
       next: (data) => {
         this.managers = data;
         console.log("MANAGERS", data);
-        
+
       },
       error: (err) => {
         console.error('Error fetching managers', err);
@@ -201,6 +197,7 @@ export class Form {
       }
 
       let requestbody = MapUserFormToResource(this.userform.value);
+      console.log("before map", requestbody);
       requestbody = { ...requestbody, empId: this.selectedEmpID };
       console.log('requestbody', requestbody);
 
@@ -211,26 +208,27 @@ export class Form {
       console.log('request made');
 
       obs.subscribe((response) => {
+        console.log(response);
         this.toastr.success(`Employee ${this.isEditMode ? 'updated' : 'added'} successfully`, 'Success');
         console.log('response', response);
         this.userform.reset()
         this.router.navigate(['/home']);
-      },error => {
-    this.toastr.error('Failed to save employee', 'Error');
-    console.error(error);
+      }, error  => {
+        this.toastr.error('Failed to save employee', 'Error');
+        console.error(error);
       });
     }
 
-  if (!this.userform.valid) {
-  this.toastr.warning('Please fill in all required fields correctly', 'Validation Error');
-  return;
-}
+    if (!this.userform.valid) {
+      this.toastr.warning('Please fill in all required fields correctly', 'Validation Error');
+      return;
+    }
 
 
-    const formData = this.userform.value;
-    formData.skill = (formData.skill || []).join(',');  // Comma-separated string
-    formData.project = (formData.project || []).join(',');
-    formData.reportingTo = (formData.reportingTo || []).join(',');
+    // const formData = this.userform.value;
+    // formData.skill = (formData.skill || []).join(',');  // Comma-separated string
+    // formData.project = (formData.project || []).join(',');
+    // formData.reportingTo = (formData.reportingTo || []).join(',');
 
 
     const action = this.isEditMode ? 'update' : 'add';
@@ -238,11 +236,9 @@ export class Form {
 
 
   onResetClick() {
-    debugger
     const confirmed = window.confirm("Are you sure you want to reset the form?");
     if (confirmed) {
       if (this.isEditMode && !deepEqual(this.originalFormData, this.userform.value)) {
-        debugger
         this.selectedSkills = this.selectedSkills.filter(skill => this.originalFormData.skill.includes(skill))
         this.selectedManagers = this.selectedManagers.filter(manager => this.originalFormData.reportingTo.includes(manager))
         this.selectedProjects = this.selectedProjects.filter(project => this.originalFormData.project.includes(project))
