@@ -6,7 +6,7 @@ export interface Employee {
   ReportingTo?: string;  // ✅ Capital 'R' to match C# model
   billable: boolean;     // ✅ Changed from 'yes'|'no' to boolean to match C# model
   skill?: string;
-  project?: string;
+  project?: string; 
   location?: string;
   email: string;
   doj?: string;         // ISO date string (YYYY-MM-DD)

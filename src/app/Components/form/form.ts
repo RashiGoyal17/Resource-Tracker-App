@@ -50,8 +50,6 @@ export class Form {
   selectedManagers: string[] = [];
   showManagerDropdown = false;
 
-
-
   ngOnInit() {
     this.loadDropdowns();
     this.initForm();
@@ -76,20 +74,26 @@ export class Form {
 
       if (this.isEditMode) {
         this.empservices.get(this.empId!).subscribe((emp: any) => {
+          console.log("emp", emp);
+          
           if (emp.doj) {
             emp.doj = this.formatDateForInput(emp.doj);
           }
 
           emp.project = emp.project?.split(',') ?? [];
           emp.skill = emp.skill?.split(',') ?? [];
-          emp.reportingTo = emp.reportingTo?.split(',') ?? [];
+          emp.reportingTo = emp.ReportingTo?.split(',') ?? [];
 
           emp.billable = emp.billable ? "yes" : "no";
 
           const { empId, ...rest } = emp;
           this.originalFormData = JSON.parse(JSON.stringify(rest));
-
+          
+          console.log("Got emp details:", emp);
+          
           this.userform.patchValue(emp);
+          console.log("form data:", this.userform.value );
+
           this.selectedProjects = emp.project;
           this.selectedSkills = emp.skill;
           this.selectedManagers = emp.reportingTo;
@@ -162,8 +166,6 @@ export class Form {
   }
 
 
-
-
   initForm() {
 
     this.userform = this.fb.group({
@@ -211,9 +213,12 @@ export class Form {
         console.log(response);
         this.toastr.success(`Employee ${this.isEditMode ? 'updated' : 'added'} successfully`, 'Success');
         console.log('response', response);
-        this.userform.reset()
-        this.router.navigate(['/home']);
-      }, error  => {
+        this.userform.reset();
+        if (this.isEditMode) {
+          this.empservices.setSelectedEmployee(this.userform.value);
+        }
+        this.router.navigate(['/Home']);
+      }, error => {
         this.toastr.error('Failed to save employee', 'Error');
         console.error(error);
       });
@@ -223,12 +228,6 @@ export class Form {
       this.toastr.warning('Please fill in all required fields correctly', 'Validation Error');
       return;
     }
-
-
-    // const formData = this.userform.value;
-    // formData.skill = (formData.skill || []).join(',');  // Comma-separated string
-    // formData.project = (formData.project || []).join(',');
-    // formData.reportingTo = (formData.reportingTo || []).join(',');
 
 
     const action = this.isEditMode ? 'update' : 'add';

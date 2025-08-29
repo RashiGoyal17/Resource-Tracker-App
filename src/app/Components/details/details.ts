@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Employee } from '../../Interface/Interface';
 import { MyServices } from '../../Services/my-services';
-import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -15,7 +14,7 @@ export class Details {
   user?: Employee;
   empId!: number;
 
-  constructor(private empService: MyServices, private route: ActivatedRoute, private router: Router) { }
+  constructor(private empService: MyServices) { }
 
   ngOnInit() {
     this.empService.getSelectedEmployee().subscribe((emp) => {

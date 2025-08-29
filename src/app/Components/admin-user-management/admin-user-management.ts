@@ -7,11 +7,11 @@ import { process, State } from '@progress/kendo-data-query';
 
 // Assume this is the structure of your user data from the API
 export interface User {
-  id: number;
-  username: string;
-  email: string;
-  role: string;
-  doj: string;
+  // id: number;
+  Username: string;
+  Email: string;
+  Role: string;
+  Doj: string;
 }
 
 @Component({

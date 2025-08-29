@@ -1,27 +1,4 @@
-<!-- <div class="user-management-container">
-      <h2>User Management</h2>
-      <p>This page is for admins to view all user credentials.</p>
-      
-      <kendo-grid
-        [kendoGridBinding]="gridView" 
-        [pageSize]="gridState.take!" 
-        [skip]="gridState.skip!" 
-        [pageable]="true" 
-        [sortable]="true"
-        [filterable]="true"
-        (dataStateChange)="onDataStateChange($event)">
-
-        <kendo-grid-column field="id" title="ID" [width]="50"></kendo-grid-column>
-        <kendo-grid-column field="username" title="Username" [width]="120"></kendo-grid-column>
-        <kendo-grid-column field="email" title="Email" [width]="180"></kendo-grid-column>
-        <kendo-grid-column field="role" title="Role" [width]="100"></kendo-grid-column>
-        <kendo-grid-column field="doj" title="Date Joined" [width]="140"></kendo-grid-column>
-        
-      </kendo-grid>
-    </div> -->
-
-
-    <div class="user-management-container">
+<div class="user-management-container">
   <h2>User Management</h2>
   <p>This page is for admins to view all user credentials.</p>
 
@@ -34,11 +11,11 @@
     [filterable]="true"
     (dataStateChange)="onDataStateChange($event)">
 
-    <kendo-grid-column field="id" title="ID" [width]="50"></kendo-grid-column>
-    <kendo-grid-column field="username" title="Username" [width]="120"></kendo-grid-column>
-    <kendo-grid-column field="email" title="Email" [width]="180"></kendo-grid-column>
-    <kendo-grid-column field="role" title="Role" [width]="100"></kendo-grid-column>
-    <kendo-grid-column field="doj" title="Date Joined" [width]="140"></kendo-grid-column>
+    <!-- <kendo-grid-column field="id" title="ID" [width]="50"></kendo-grid-column> -->
+    <kendo-grid-column field="Username" title="Username" [width]="120"></kendo-grid-column>
+    <kendo-grid-column field="Email" title="Email" [width]="180"></kendo-grid-column>
+    <kendo-grid-column field="Role" title="Role" [width]="100"></kendo-grid-column>
+    <kendo-grid-column field="Doj" title="Date Joined" [width]="140"></kendo-grid-column>
 
   </kendo-grid>
 </div>

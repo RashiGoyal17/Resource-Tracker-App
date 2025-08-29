@@ -37,6 +37,7 @@ export class AuthService {
   }
 
   isLoggedInValue(): boolean {
+    console.log(this.getRole());
     return !!localStorage.getItem('token');
   }
 

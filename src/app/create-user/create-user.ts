@@ -40,16 +40,20 @@ export class CreateUser implements OnInit {
     });
   }
 
-  GetRoleOptions() {
-    this.http.get(Environment.URI + 'Auth/RoleOptions').subscribe({
-      next: (response: any) => {
-        this.roleOptionList = response.roleOptionList;
-      },
-      error: (err: any) => {
-        console.error(err);
-      }
-    });
-  }
+GetRoleOptions() {
+  this.http.get(Environment.URI + 'Auth/RoleOptions').subscribe({
+    next: (response: any) => {
+      this.roleOptionList = response.roleOptionList.map((r: any) => ({
+        id: r.Id,
+        name: r.Name
+      }));
+    },
+    error: (err: any) => {
+      console.error(err);
+    }
+  });
+}
+
 
   onSubmit() {
     this.successMessage = '';

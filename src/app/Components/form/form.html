@@ -32,26 +32,9 @@
         <select formControlName="designation">
           <option *ngFor="let des of designations" [value]="des">{{ des }}</option>
         </select>
-
-        <!-- <input type="text" id="designation" formControlName="designation" /> -->
-        <!-- <div class="error" *ngIf="userform.get('designation')?.invalid && (userform.get('designation')?.touched || userform.get('designation')?.dirty)">
-          <span *ngIf="userform.get('designation')?.hasError('required')">Designation is required.</span>
-        </div> -->
       </div>
 
       <!-- Reporting To -->
-
-      <!-- <div class="form-group">
-        <label for="reportingTo">Reporting To <span class="required">*</span></label>
-
-        <select formControlName="reportingTo" multiple>
-          <option *ngFor="let m of managers" [value]="m">{{ m }}</option>
-        </select> -->
-      <!-- <input type="text" id="reportingTo" formControlName="reportingTo" />
-        <div class="error" *ngIf="userform.get('reportingTo')?.invalid && (userform.get('reportingTo')?.touched || userform.get('reportingTo')?.dirty)">
-          <span *ngIf="userform.get('reportingTo')?.hasError('required')">Reporting To is required.</span>
-        </div> -->
-      <!-- </div> -->
 
       <div class="form-group custom-multiselect">
         <label for="reportingTo">Reporting To <span class="required">*</span></label>
@@ -96,21 +79,6 @@
 
     <!-- Right Column -->
     <div class="form-column form-right">
-      <!-- Skill -->
-
-      <!-- <div class="form-group skill-group-input">
-        <label for="skill">Skill <span class="required">*</span></label>
-        <select formControlName="skill" multiple size="5">
-          <option *ngFor="let s of skills" [value]="s">{{ s }}</option>
-        </select> -->
-
-
-      <!-- <input type="text" id="skill" formControlName="skill" />
-        <div class="error" *ngIf="userform.get('skill')?.invalid && (userform.get('skill')?.touched || userform.get('skill')?.dirty)">
-          <span *ngIf="userform.get('skill')?.hasError('required')">Skill is required.</span>
-        </div> -->
-
-      <!-- </div> -->
       <!-- Custom Skill Multi-Select -->
       <div class="form-group custom-multiselect">
         <label for="skill">Skill <span class="required">*</span></label>
@@ -143,17 +111,6 @@
 
 
       <!-- Project -->
-
-      <!-- <div class="form-group">
-        <label for="project">Project <span class="required">*</span></label>
-        <select formControlName="project" multiple>
-          <option *ngFor="let p of projects" [value]="p">{{ p }}</option>
-        </select> -->
-      <!-- <input type="text" id="project" formControlName="project" />
-        <div class="error" *ngIf="userform.get('project')?.invalid && (userform.get('project')?.touched || userform.get('project')?.dirty)">
-          <span *ngIf="userform.get('project')?.hasError('required')">Project is required.</span>
-        </div> -->
-      <!-- </div> -->
 
       <div class="form-group custom-multiselect">
         <label for="project">Project <span class="required">*</span></label>
@@ -190,10 +147,6 @@
         <select formControlName="location">
           <option *ngFor="let l of locations" [value]="l">{{ l }}</option>
         </select>
-        <!-- <input type="text" id="location" formControlName="location" />
-        <div class="error" *ngIf="userform.get('location')?.invalid && (userform.get('location')?.touched || userform.get('location')?.dirty)">
-          <span *ngIf="userform.get('location')?.hasError('required')">Location is required.</span>
-        </div> -->
       </div>
 
       <!-- DOJ -->
