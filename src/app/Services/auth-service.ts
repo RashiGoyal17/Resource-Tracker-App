@@ -37,8 +37,11 @@ export class AuthService {
   }
 
   isLoggedInValue(): boolean {
-    console.log(this.getRole());
-    return !!localStorage.getItem('token');
+    // console.log(this.getRole());
+    const decoded = this.decodeToken();
+    // console.log(decoded);
+    if(!decoded) return false;
+    return decoded?.exp * 1000 > Date.now();
   }
 
   getToken(): string | null {
@@ -58,6 +61,10 @@ export class AuthService {
       return decodedToken?.role;
     }
     return null;
+  }
+
+  removeToken() {
+    localStorage.removeItem('token');
   }
 
   // getAuth(data:any){

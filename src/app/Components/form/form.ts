@@ -83,6 +83,7 @@ export class Form {
           emp.project = emp.project?.split(',') ?? [];
           emp.skill = emp.skill?.split(',') ?? [];
           emp.reportingTo = emp.ReportingTo?.split(',') ?? [];
+          delete emp.ReportingTo; // remove old key to avoid confusion
 
           emp.billable = emp.billable ? "yes" : "no";
 
